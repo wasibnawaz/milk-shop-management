@@ -62,11 +62,15 @@ class SaleController extends Controller
 
     public function create(): View
     {
+        $this->authorize('create', Sale::class);
+
         return view('sales.create', $this->formData());
     }
 
     public function store(StoreSaleRequest $request): RedirectResponse
     {
+        $this->authorize('create', Sale::class);
+
         $sale = Sale::create($request->saleData() + ['user_id' => $request->user()?->id]);
 
         return redirect()
@@ -80,11 +84,15 @@ class SaleController extends Controller
      */
     public function edit(Sale $sale): View
     {
+        $this->authorize('update', $sale);
+
         return view('sales.edit', ['sale' => $sale] + $this->formData());
     }
 
     public function update(UpdateSaleRequest $request, Sale $sale): RedirectResponse
     {
+        $this->authorize('update', $sale);
+
         $sale->update($request->saleData());
 
         return redirect()
@@ -94,6 +102,8 @@ class SaleController extends Controller
 
     public function destroy(Sale $sale): RedirectResponse
     {
+        $this->authorize('delete', $sale);
+
         // Soft delete — financial history stays recoverable.
         $sale->delete();
 

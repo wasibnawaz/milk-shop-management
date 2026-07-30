@@ -27,11 +27,15 @@ class ProductController extends Controller
 
     public function create(): View
     {
+        $this->authorize('create', Product::class);
+
         return view('products.create', ['units' => ProductUnit::options()]);
     }
 
     public function store(StoreProductRequest $request): RedirectResponse
     {
+        $this->authorize('create', Product::class);
+
         $product = Product::create($request->validated());
 
         return redirect()
@@ -41,6 +45,8 @@ class ProductController extends Controller
 
     public function edit(Product $product): View
     {
+        $this->authorize('update', $product);
+
         return view('products.edit', [
             'product' => $product,
             'units' => ProductUnit::options(),
@@ -49,6 +55,8 @@ class ProductController extends Controller
 
     public function update(StoreProductRequest $request, Product $product): RedirectResponse
     {
+        $this->authorize('update', $product);
+
         $product->update($request->validated());
 
         return redirect()
@@ -58,6 +66,8 @@ class ProductController extends Controller
 
     public function destroy(Product $product): RedirectResponse
     {
+        $this->authorize('delete', $product);
+
         // The sales.product_id foreign key is restrictOnDelete, so a product
         // with history cannot be removed. Deactivating hides it from the sale
         // form while leaving past sales intact and reportable.

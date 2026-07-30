@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Enums\UserRole;
 use App\Models\Dealer;
 use App\Models\Product;
 use App\Models\Sale;
@@ -14,7 +15,33 @@ class DatabaseSeeder extends Seeder
     {
         $owner = User::firstOrCreate(
             ['email' => 'owner@haqbahoo.test'],
-            ['name' => 'Shop Owner', 'password' => 'password']
+            [
+                'name' => 'Shop Owner',
+                'password' => 'password',
+                'role' => UserRole::Admin,
+                'is_active' => true,
+            ]
+        );
+
+        // One account per role so permissions can be exercised straight away.
+        User::firstOrCreate(
+            ['email' => 'manager@haqbahoo.test'],
+            [
+                'name' => 'Shop Manager',
+                'password' => 'password',
+                'role' => UserRole::Manager,
+                'is_active' => true,
+            ]
+        );
+
+        User::firstOrCreate(
+            ['email' => 'cashier@haqbahoo.test'],
+            [
+                'name' => 'Counter Cashier',
+                'password' => 'password',
+                'role' => UserRole::Cashier,
+                'is_active' => true,
+            ]
         );
 
         // Realistic dairy catalogue rather than faker noise, so the dashboard
