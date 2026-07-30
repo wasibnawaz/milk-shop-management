@@ -37,7 +37,45 @@
                 @endcan
             </x-empty-state>
         @else
-            <div class="overflow-x-auto">
+            {{-- Mobile: cards. A wide table forces a phone's layout viewport to
+                 zoom out, shrinking every label on the page. --}}
+            <ul class="divide-y divide-slate-100 md:hidden dark:divide-slate-800">
+                @foreach ($products as $product)
+                    <li class="flex items-start gap-3 px-4 py-3.5">
+                        <div class="min-w-0 flex-1">
+                            <p class="truncate text-sm font-medium text-slate-900 dark:text-white">
+                                {{ $product->name }}
+                            </p>
+                            <p class="mt-0.5 text-xs text-slate-500 dark:text-slate-400">
+                                @money($product->default_rate) per {{ $product->unit->label() }}
+                                &middot; {{ number_format($product->sales_count) }} {{ Str::plural('sale', $product->sales_count) }}
+                            </p>
+                            <span class="mt-1.5 inline-flex rounded-full px-2 py-0.5 text-[11px] font-medium ring-1 ring-inset
+                                {{ $product->is_active
+                                    ? 'bg-emerald-100 text-emerald-800 ring-emerald-600/20 dark:bg-emerald-500/15 dark:text-emerald-300 dark:ring-emerald-400/30'
+                                    : 'bg-slate-100 text-slate-600 ring-slate-500/20 dark:bg-slate-700 dark:text-slate-300 dark:ring-slate-500/30' }}">
+                                {{ $product->is_active ? 'Active' : 'Inactive' }}
+                            </span>
+                        </div>
+
+                        <div class="flex shrink-0 items-center gap-1">
+                            @can('update', $product)
+                                <a href="{{ route('products.edit', $product) }}"
+                                    class="inline-flex rounded-lg p-2 text-slate-500 hover:bg-brand-50 hover:text-brand-600 dark:text-slate-400 dark:hover:bg-brand-500/10">
+                                    <span class="sr-only">Edit {{ $product->name }}</span>
+                                    <x-icon name="pencil" class="h-4 w-4" />
+                                </a>
+                            @endcan
+                            @can('delete', $product)
+                                <x-delete-form :action="route('products.destroy', $product)"
+                                    :confirm="'Delete '.$product->name.'?'" />
+                            @endcan
+                        </div>
+                    </li>
+                @endforeach
+            </ul>
+
+            <div class="hidden overflow-x-auto md:block">
                 <table class="w-full min-w-[36rem] text-left text-sm">
                     <thead class="border-b border-slate-200 bg-slate-50 dark:border-slate-800 dark:bg-slate-800/50">
                         <tr>

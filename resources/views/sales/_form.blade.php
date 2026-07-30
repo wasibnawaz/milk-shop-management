@@ -28,7 +28,10 @@
         amountPaid: @js($initial['amountPaid']),
 
         get total() {
-            return Math.round((Number(this.quantity) || 0) * (Number(this.rate) || 0) * 100) / 100;
+            const value = Math.round((Number(this.quantity) || 0) * (Number(this.rate) || 0) * 100) / 100;
+
+            // `0 * -5` is -0, which formats as the nonsensical '-0.00'.
+            return value === 0 ? 0 : value;
         },
         get unit() {
             return this.meta[this.productId]?.unit ?? '';

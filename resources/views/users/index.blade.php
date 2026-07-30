@@ -27,7 +27,51 @@
             <x-empty-state icon="shield" title="No accounts found"
                 :description="$search ? 'No account matches that search.' : 'Create accounts for your staff.'" />
         @else
-            <div class="overflow-x-auto">
+            {{-- Mobile: cards, for the same layout-viewport reason as products. --}}
+            <ul class="divide-y divide-slate-100 lg:hidden dark:divide-slate-800">
+                @foreach ($users as $staff)
+                    <li class="flex items-start gap-3 px-4 py-3.5">
+                        <div class="min-w-0 flex-1">
+                            <p class="truncate text-sm font-medium text-slate-900 dark:text-white">
+                                {{ $staff->name }}
+                                @if ($staff->is(auth()->user()))
+                                    <span class="text-xs font-normal text-slate-500 dark:text-slate-400">(you)</span>
+                                @endif
+                            </p>
+                            <p class="mt-0.5 truncate text-xs text-slate-500 dark:text-slate-400">
+                                {{ $staff->email }}
+                            </p>
+                            <p class="mt-0.5 text-xs text-slate-500 dark:text-slate-400">
+                                Last seen {{ $staff->last_login_at?->diffForHumans() ?? 'never' }}
+                            </p>
+                            <div class="mt-1.5 flex flex-wrap items-center gap-1.5">
+                                <span class="inline-flex rounded-full px-2 py-0.5 text-[11px] font-medium ring-1 ring-inset {{ $staff->role->badgeClasses() }}">
+                                    {{ $staff->role->label() }}
+                                </span>
+                                @unless ($staff->is_active)
+                                    <span class="inline-flex rounded-full bg-slate-100 px-2 py-0.5 text-[11px] font-medium text-slate-600 ring-1 ring-slate-500/20 ring-inset dark:bg-slate-700 dark:text-slate-300">
+                                        Disabled
+                                    </span>
+                                @endunless
+                            </div>
+                        </div>
+
+                        <div class="flex shrink-0 items-center gap-1">
+                            <a href="{{ route('users.edit', $staff) }}"
+                                class="inline-flex rounded-lg p-2 text-slate-500 hover:bg-brand-50 hover:text-brand-600 dark:text-slate-400 dark:hover:bg-brand-500/10">
+                                <span class="sr-only">Edit {{ $staff->name }}</span>
+                                <x-icon name="pencil" class="h-4 w-4" />
+                            </a>
+                            @can('delete', $staff)
+                                <x-delete-form :action="route('users.destroy', $staff)"
+                                    :confirm="'Remove '.$staff->name.'? Their recorded sales are kept.'" />
+                            @endcan
+                        </div>
+                    </li>
+                @endforeach
+            </ul>
+
+            <div class="hidden overflow-x-auto lg:block">
                 <table class="w-full min-w-[42rem] text-left text-sm">
                     <thead class="border-b border-slate-200 bg-slate-50 dark:border-slate-800 dark:bg-slate-800/50">
                         <tr>

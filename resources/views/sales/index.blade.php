@@ -107,7 +107,7 @@
             </x-empty-state>
         @else
             {{-- Mobile: cards. A 9-column table cannot be read on a phone. --}}
-            <ul class="divide-y divide-slate-100 md:hidden dark:divide-slate-800">
+            <ul class="divide-y divide-slate-100 lg:hidden dark:divide-slate-800">
                 @foreach ($sales as $sale)
                     <li class="px-4 py-3.5">
                         <div class="flex items-start justify-between gap-3">
@@ -156,7 +156,7 @@
             </ul>
 
             {{-- Desktop: full sortable table, scrolling inside its own container. --}}
-            <div class="hidden overflow-x-auto md:block">
+            <div class="hidden overflow-x-auto lg:block">
                 <table class="w-full min-w-[54rem] text-left text-sm">
                     <thead class="border-b border-slate-200 bg-slate-50 dark:border-slate-800 dark:bg-slate-800/50">
                         <tr>
