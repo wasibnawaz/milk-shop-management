@@ -37,7 +37,43 @@
                 @endcan
             </x-empty-state>
         @else
-            <div class="overflow-x-auto">
+            {{-- Mobile: cards, for the same layout-viewport reason as products. --}}
+            <ul class="divide-y divide-slate-100 md:hidden dark:divide-slate-800">
+                @foreach ($dealers as $dealer)
+                    <li class="flex items-start gap-3 px-4 py-3.5">
+                        <div class="min-w-0 flex-1">
+                            <p class="truncate text-sm font-medium text-slate-900 dark:text-white">
+                                {{ $dealer->name }}
+                            </p>
+                            <p class="mt-0.5 truncate text-xs text-slate-500 dark:text-slate-400">
+                                {{ $dealer->phone ?? 'No phone' }}
+                                @if ($dealer->address)
+                                    &middot; {{ $dealer->address }}
+                                @endif
+                            </p>
+                            <p class="mt-0.5 text-xs text-slate-500 dark:text-slate-400">
+                                {{ number_format($dealer->sales_count) }} {{ Str::plural('sale', $dealer->sales_count) }}
+                            </p>
+                        </div>
+
+                        <div class="flex shrink-0 items-center gap-1">
+                            @can('update', $dealer)
+                                <a href="{{ route('dealers.edit', $dealer) }}"
+                                    class="inline-flex rounded-lg p-2 text-slate-500 hover:bg-brand-50 hover:text-brand-600 dark:text-slate-400 dark:hover:bg-brand-500/10">
+                                    <span class="sr-only">Edit {{ $dealer->name }}</span>
+                                    <x-icon name="pencil" class="h-4 w-4" />
+                                </a>
+                            @endcan
+                            @can('delete', $dealer)
+                                <x-delete-form :action="route('dealers.destroy', $dealer)"
+                                    :confirm="'Delete '.$dealer->name.'? Their recorded sales are kept but detached.'" />
+                            @endcan
+                        </div>
+                    </li>
+                @endforeach
+            </ul>
+
+            <div class="hidden overflow-x-auto md:block">
                 <table class="w-full min-w-[36rem] text-left text-sm">
                     <thead class="border-b border-slate-200 bg-slate-50 dark:border-slate-800 dark:bg-slate-800/50">
                         <tr>

@@ -83,6 +83,9 @@ class Sale extends Model
             );
 
             $sale->payment_status = match (true) {
+                // A zero-value sale (a free sample, say) owes nothing, so it
+                // is settled — not "unpaid", which would misreport it.
+                (float) $sale->total_amount <= 0 => PaymentStatus::Paid,
                 (float) $sale->amount_paid <= 0 => PaymentStatus::Unpaid,
                 (float) $sale->amount_paid >= (float) $sale->total_amount => PaymentStatus::Paid,
                 default => PaymentStatus::Partial,

@@ -13,7 +13,15 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 @theme {
-    --font-sans: 'Jost', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
+    /*
+    | System font stack, deliberately not a webfont. The app previously pulled
+    | Jost from a font CDN; that is one more host that can be slow, blocked, or
+    | unreachable — and when it was, the page rendered unstyled text. A shop
+    | back office is used on the counter, sometimes offline, so the interface
+    | now has zero external requests and paints immediately.
+    */
+    --font-sans: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue',
+        Arial, 'Noto Sans', sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
         'Segoe UI Symbol', 'Noto Color Emoji';
 
     /* Brand palette — dairy blue, tuned to hold AA contrast on both themes. */
