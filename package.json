@@ -1,18 +1,21 @@
 {
+    "$schema": "https://www.schemastore.org/package.json",
     "private": true,
+    "type": "module",
     "scripts": {
-        "dev": "npm run development",
-        "development": "mix",
-        "watch": "mix watch",
-        "watch-poll": "mix watch -- --watch-options-poll=1000",
-        "hot": "mix watch --hot",
-        "prod": "npm run production",
-        "production": "mix --production"
+        "build": "vite build",
+        "dev": "vite"
     },
     "devDependencies": {
-        "axios": "^0.25",
-        "laravel-mix": "^6.0.6",
-        "lodash": "^4.17.19",
-        "postcss": "^8.1.14"
+        "@tailwindcss/vite": "^4.3.3",
+        "alpinejs": "^3.15.12",
+        "axios": "^1.19.0",
+        "concurrently": "^9.2.4",
+        "laravel-vite-plugin": "^2.1.0",
+        "tailwindcss": "^4.3.3",
+        "vite": "^7.3.6"
+    },
+    "allowScripts": {
+        "esbuild@0.28.1": true
     }
 }
