@@ -1,0 +1,63 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: "Jost", sans-serif;
+}
+
+nav {
+    box-shadow: 0 2px 12px #33333327;
+}
+
+.sidebar {
+    height: 100%;
+    width: 250px;
+    position: fixed;
+    background-color: #f0f0f0;
+    color: #414141;
+}
+
+.navbar {
+    margin-left: 250px;
+    padding: 15px;
+    box-shadow: 0 2px 12px #55555527;
+}
+
+.milk {
+    margin: 6% auto;
+    padding: 50px;
+    border-radius: 20px;
+    background: linear-gradient(45deg, #032D66, #1f1f1f);
+    color: #fff;
+    box-shadow: 0 2px 12px #33333333;
+}
+
+.form-control:focus {
+    box-shadow: 0 0 2px #666666bb;
+    border-color: #666666bb;
+}
+
+/* for table pagination */
+.pagination {
+    display: flex;
+    justify-content: center;
+    margin-top: 10px;
+}
+
+.pagination a {
+    color: black;
+    border: 1px solid #ccc;
+    padding: 6px 15px;
+    text-decoration: none;
+    cursor: pointer;
+    margin-right: 6px;
+    transition: background-color 0.3s;
+}
+
+.pagination a.active {
+    background-color: #000;
+    color: white;
+}
