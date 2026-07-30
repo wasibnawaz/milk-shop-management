@@ -16,7 +16,9 @@
 
     <div class="flex h-16 items-center justify-between gap-2 border-b border-slate-200 px-4 dark:border-slate-800">
         <a href="{{ route('dashboard') }}" class="flex min-w-0 items-center gap-2.5">
-            <img src="{{ asset('images/logo2.png') }}" alt="" class="h-9 w-9 shrink-0 object-contain">
+            {{-- w-auto, not a square: the logo is wider than it is tall and
+                 forcing a 1:1 box squashed it. --}}
+            <img src="{{ asset('images/logo2.png') }}" alt="" class="h-9 w-auto max-w-24 shrink-0 object-contain">
             <span class="truncate text-sm font-semibold text-slate-900 dark:text-white">
                 {{ config('app.name') }}
             </span>

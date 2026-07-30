@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreDealerRequest;
 use App\Models\Dealer;
+use App\Support\TableSort;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -14,17 +15,27 @@ class DealerController extends Controller
     {
         $search = $request->string('search')->toString();
 
-        $dealers = Dealer::query()
+        $sorter = TableSort::make([
+            'name' => 'name',
+            'phone' => 'phone',
+            'sales_count' => 'sales_count',
+            'is_active' => 'is_active',
+        ], 'name', 'asc');
+
+        $query = Dealer::query()
             ->withCount('sales')
             ->when($search, fn ($q, $term) => $q->where(
                 fn ($sub) => $sub->where('name', 'like', "%{$term}%")
                     ->orWhere('phone', 'like', "%{$term}%")
-            ))
-            ->orderBy('name')
-            ->paginate(config('shop.per_page'))
-            ->withQueryString();
+            ));
 
-        return view('dealers.index', compact('dealers', 'search'));
+        $sorter->apply($query, $request);
+
+        return view('dealers.index', [
+            'dealers' => $query->paginate(config('shop.per_page'))->withQueryString(),
+            'search' => $search,
+            'sort' => $sorter->state($request),
+        ]);
     }
 
     public function create(): View

@@ -57,17 +57,29 @@ Serving the project root exposes `.env`, `vendor/`, and `storage/logs/` over HTT
 
 ---
 
-## Seeded login
+## Seeded logins
 
-`php artisan migrate --seed` creates a demo owner account and roughly three months of
+`php artisan migrate --seed` creates one account per role and roughly three months of
 sales history so the dashboard has something to show.
 
-| Email                 | Password   |
-| --------------------- | ---------- |
-| `owner@haqbahoo.test` | `password` |
+| Email                   | Password   | Role          |
+| ----------------------- | ---------- | ------------- |
+| `owner@haqbahoo.test`   | `password` | Administrator |
+| `manager@haqbahoo.test` | `password` | Manager       |
+| `cashier@haqbahoo.test` | `password` | Cashier       |
 
-> Authentication arrives in Milestone 2 — the account exists but no login screen is
-> active yet. **Change this password before deploying anywhere.**
+> **Change these passwords before deploying anywhere.** There is no public
+> registration route — accounts are created by an administrator under **Staff**.
+
+### Roles
+
+| Role          | Can do                                                                  |
+| ------------- | ----------------------------------------------------------------------- |
+| Administrator | Everything, including staff management                                   |
+| Manager       | Sales, products and dealers; may delete records                          |
+| Cashier       | Records sales; may edit only their own, and only on the day recorded     |
+
+Authorization is enforced by policies in `app/Policies/`, not just by hiding buttons.
 
 ---
 
@@ -75,13 +87,18 @@ sales history so the dashboard has something to show.
 
 ```
 app/
-├── Enums/                  PaymentStatus, ProductUnit — labels + badge styling
+├── Enums/                  PaymentStatus, ProductUnit, UserRole — labels + badge styling
 ├── Http/
-│   ├── Controllers/        Dashboard, Sale, Product, Dealer (resource controllers)
+│   ├── Controllers/        Dashboard, Sale, Product, Dealer, User, Profile, Auth/
+│   ├── Middleware/         EnsureUserIsActive, EnsureUserHasRole
 │   └── Requests/           Form Requests — all validation lives here
 ├── Models/                 Product, Dealer, Sale, User
-├── Providers/              Blade directives, dev-time model strictness
-└── Support/Money.php       Currency and quantity formatting
+├── Policies/               Per-resource authorization
+├── Providers/              Blade directives, rate limiters, model strictness
+└── Support/
+    ├── Money.php           Currency and quantity formatting
+    ├── TableSort.php       Whitelisted sorting (raw sort input never hits orderBy)
+    └── ReportPeriod.php    Dashboard date-range presets
 
 resources/
 ├── css/app.css             Tailwind 4 entry, brand tokens, dark-mode variant
@@ -139,10 +156,31 @@ Shop-specific settings live in `config/shop.php`, driven by these `.env` keys:
 | Milestone | Scope                            | Status    |
 | --------- | -------------------------------- | --------- |
 | 1         | Codebase audit & foundation      | ✅ Done    |
-| 2         | Security & backend improvements  | ⏳ Next    |
-| 3         | Modern UI/UX & frontend          | ⏳ Pending |
-| 4         | Advanced features & optimization | ⏳ Pending |
-| 5         | Testing & final delivery         | ⏳ Pending |
+| 2         | Security & backend improvements  | ✅ Done    |
+| 3         | Modern UI/UX & frontend          | ✅ Done    |
+| 4         | Advanced features & optimization | ✅ Done    |
+| 5         | Testing & final delivery         | ⏳ Next    |
 
-> **Not production-ready yet.** There is no authentication until Milestone 2 — every
-> route is currently public. Do not deploy to a reachable host before then.
+## Deploying
+
+```bash
+composer install --no-dev --optimize-autoloader
+npm ci && npm run build
+
+php artisan migrate --force
+php artisan config:cache
+php artisan route:cache
+php artisan view:cache
+```
+
+Set in the production `.env`:
+
+```
+APP_ENV=production
+APP_DEBUG=false          # leaking stack traces exposes credentials
+APP_URL=https://your-domain
+```
+
+Point the web server's document root at **`public/`**, and change the seeded
+passwords. Authentication events are written to `storage/logs/security.log`
+with 180-day retention.

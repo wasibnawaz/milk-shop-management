@@ -3,9 +3,11 @@
     <x-card :padded="false">
         <x-slot:title>Dealers &amp; Suppliers</x-slot:title>
         <x-slot:actions>
-            <x-button :href="route('dealers.create')" size="sm">
-                <x-icon name="plus" class="h-4 w-4" /> New Dealer
-            </x-button>
+            @can('create', App\Models\Dealer::class)
+                <x-button :href="route('dealers.create')" size="sm">
+                    <x-icon name="plus" class="h-4 w-4" /> New Dealer
+                </x-button>
+            @endcan
         </x-slot:actions>
 
         <form method="get" action="{{ route('dealers.index') }}"
@@ -26,22 +28,24 @@
         @if ($dealers->isEmpty())
             <x-empty-state icon="users" title="No dealers found"
                 :description="$search ? 'No dealer matches that search.' : 'Add the dealers who supply your shop.'">
-                <x-slot:action>
-                    <x-button :href="route('dealers.create')">
-                        <x-icon name="plus" class="h-4 w-4" /> New Dealer
-                    </x-button>
-                </x-slot:action>
+                @can('create', App\Models\Dealer::class)
+                    <x-slot:action>
+                        <x-button :href="route('dealers.create')">
+                            <x-icon name="plus" class="h-4 w-4" /> New Dealer
+                        </x-button>
+                    </x-slot:action>
+                @endcan
             </x-empty-state>
         @else
             <div class="overflow-x-auto">
                 <table class="w-full min-w-[36rem] text-left text-sm">
                     <thead class="border-b border-slate-200 bg-slate-50 dark:border-slate-800 dark:bg-slate-800/50">
-                        <tr class="text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
-                            <th scope="col" class="px-4 py-3 sm:px-5">Name</th>
-                            <th scope="col" class="px-4 py-3">Phone</th>
-                            <th scope="col" class="px-4 py-3">Address</th>
-                            <th scope="col" class="px-4 py-3 text-right">Sales</th>
-                            <th scope="col" class="px-4 py-3">Status</th>
+                        <tr>
+                            <x-sort-header column="name" :sort="$sort" class="sm:pl-5">Name</x-sort-header>
+                            <x-sort-header column="phone" :sort="$sort">Phone</x-sort-header>
+                            <th scope="col" class="px-4 py-3 text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">Address</th>
+                            <x-sort-header column="sales_count" :sort="$sort" align="right" class="text-right">Sales</x-sort-header>
+                            <x-sort-header column="is_active" :sort="$sort">Status</x-sort-header>
                             <th scope="col" class="px-4 py-3 text-right sm:px-5"><span class="sr-only">Actions</span></th>
                         </tr>
                     </thead>
@@ -71,14 +75,18 @@
                                 </td>
                                 <td class="px-4 py-3 text-right whitespace-nowrap sm:px-5">
                                     <div class="flex items-center justify-end gap-1">
+                                        @can('update', $dealer)
                                         <a href="{{ route('dealers.edit', $dealer) }}"
                                             class="inline-flex rounded-lg p-2 text-slate-500 transition-colors hover:bg-brand-50 hover:text-brand-600 dark:text-slate-400 dark:hover:bg-brand-500/10 dark:hover:text-brand-400">
                                             <span class="sr-only">Edit {{ $dealer->name }}</span>
                                             <x-icon name="pencil" class="h-4 w-4" />
                                         </a>
+                                        @endcan
 
+                                        @can('delete', $dealer)
                                         <x-delete-form :action="route('dealers.destroy', $dealer)"
                                             :confirm="'Delete '.$dealer->name.'? Their '.$dealer->sales_count.' recorded sales will be kept but detached.'" />
+                                        @endcan
                                     </div>
                                 </td>
                             </tr>

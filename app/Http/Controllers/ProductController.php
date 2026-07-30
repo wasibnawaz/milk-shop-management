@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Enums\ProductUnit;
 use App\Http\Requests\StoreProductRequest;
 use App\Models\Product;
+use App\Support\TableSort;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -15,14 +16,25 @@ class ProductController extends Controller
     {
         $search = $request->string('search')->toString();
 
-        $products = Product::query()
-            ->withCount('sales')
-            ->when($search, fn ($q, $term) => $q->where('name', 'like', "%{$term}%"))
-            ->orderBy('name')
-            ->paginate(config('shop.per_page'))
-            ->withQueryString();
+        $sorter = TableSort::make([
+            'name' => 'name',
+            'unit' => 'unit',
+            'default_rate' => 'default_rate',
+            'sales_count' => 'sales_count',
+            'is_active' => 'is_active',
+        ], 'name', 'asc');
 
-        return view('products.index', compact('products', 'search'));
+        $query = Product::query()
+            ->withCount('sales')
+            ->when($search, fn ($q, $term) => $q->where('name', 'like', "%{$term}%"));
+
+        $sorter->apply($query, $request);
+
+        return view('products.index', [
+            'products' => $query->paginate(config('shop.per_page'))->withQueryString(),
+            'search' => $search,
+            'sort' => $sorter->state($request),
+        ]);
     }
 
     public function create(): View

@@ -31,7 +31,7 @@
 
         {{-- Soft brand wash behind the card. --}}
         <div aria-hidden="true"
-            class="pointer-events-none absolute inset-0 bg-[radial-gradient(60rem_40rem_at_50%_-10%,theme(colors.brand.200),transparent)] opacity-60 dark:bg-[radial-gradient(60rem_40rem_at_50%_-10%,theme(colors.brand.900),transparent)] dark:opacity-50">
+            class="pointer-events-none absolute inset-0 bg-[radial-gradient(60rem_40rem_at_50%_-10%,var(--color-brand-200),transparent)] opacity-60 dark:bg-[radial-gradient(60rem_40rem_at_50%_-10%,var(--color-brand-900),transparent)] dark:opacity-50">
         </div>
 
         <div class="absolute top-4 right-4">
@@ -40,7 +40,7 @@
 
         <div class="relative w-full max-w-md">
             <div class="mb-6 flex flex-col items-center text-center">
-                <img src="{{ asset('images/logo2.png') }}" alt="" class="h-16 w-16 object-contain">
+                <img src="{{ asset('images/logo2.png') }}" alt="" class="h-14 w-auto max-w-[12rem] object-contain">
                 <h1 class="mt-3 text-xl font-semibold text-slate-900 dark:text-white">{{ config('app.name') }}</h1>
                 @isset($subtitle)
                     <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">{{ $subtitle }}</p>
