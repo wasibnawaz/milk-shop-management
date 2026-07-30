@@ -3,8 +3,11 @@
 namespace App\Providers;
 
 use App\Support\Money;
+use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Blade;
+use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -24,6 +27,22 @@ class AppServiceProvider extends ServiceProvider
     {
         $this->configureModels();
         $this->configureBladeDirectives();
+        $this->configureRateLimiting();
+    }
+
+    private function configureRateLimiting(): void
+    {
+        /*
+        | Login throttle keyed on IP. This sits on top of the per-email
+        | lockout inside LoginRequest: that one stops a single account being
+        | brute forced, this one stops an attacker spraying many accounts
+        | from one host.
+        */
+        RateLimiter::for('login', fn (Request $request) => Limit::perMinute(20)->by($request->ip()));
+
+        // Blanket ceiling for authenticated write traffic.
+        RateLimiter::for('writes', fn (Request $request) => Limit::perMinute(60)
+            ->by($request->user()?->id ?: $request->ip()));
     }
 
     private function configureModels(): void

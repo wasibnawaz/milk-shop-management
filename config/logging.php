@@ -73,6 +73,19 @@ return [
             'replace_placeholders' => true,
         ],
 
+        /*
+        | Dedicated audit trail for authentication and account changes, kept
+        | apart from application noise and retained far longer so a security
+        | question months later is still answerable.
+        */
+        'security' => [
+            'driver' => 'daily',
+            'path' => storage_path('logs/security.log'),
+            'level' => 'info',
+            'days' => env('LOG_SECURITY_DAYS', 180),
+            'replace_placeholders' => true,
+        ],
+
         'slack' => [
             'driver' => 'slack',
             'url' => env('LOG_SLACK_WEBHOOK_URL'),

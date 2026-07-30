@@ -1,10 +1,13 @@
 @php
-    $links = [
-        ['route' => 'dashboard', 'label' => 'Dashboard', 'icon' => 'home'],
-        ['route' => 'sales.index', 'label' => 'Sales', 'icon' => 'receipt'],
-        ['route' => 'products.index', 'label' => 'Products', 'icon' => 'box'],
-        ['route' => 'dealers.index', 'label' => 'Dealers', 'icon' => 'users'],
-    ];
+    $user = auth()->user();
+
+    $links = collect([
+        ['route' => 'dashboard', 'label' => 'Dashboard', 'icon' => 'home', 'can' => true],
+        ['route' => 'sales.index', 'label' => 'Sales', 'icon' => 'receipt', 'can' => true],
+        ['route' => 'products.index', 'label' => 'Products', 'icon' => 'box', 'can' => true],
+        ['route' => 'dealers.index', 'label' => 'Dealers', 'icon' => 'users', 'can' => true],
+        ['route' => 'users.index', 'label' => 'Staff', 'icon' => 'shield', 'can' => (bool) $user?->isAdmin()],
+    ])->where('can', true);
 @endphp
 
 <aside x-cloak
@@ -12,7 +15,7 @@
     class="fixed inset-y-0 left-0 z-40 flex w-64 shrink-0 flex-col border-r border-slate-200 bg-white transition-transform duration-200 ease-out lg:static lg:translate-x-0 dark:border-slate-800 dark:bg-slate-900">
 
     <div class="flex h-16 items-center justify-between gap-2 border-b border-slate-200 px-4 dark:border-slate-800">
-        <a href="{{ route('dashboard') }}" class="flex items-center gap-2.5 min-w-0">
+        <a href="{{ route('dashboard') }}" class="flex min-w-0 items-center gap-2.5">
             <img src="{{ asset('images/logo2.png') }}" alt="" class="h-9 w-9 shrink-0 object-contain">
             <span class="truncate text-sm font-semibold text-slate-900 dark:text-white">
                 {{ config('app.name') }}
@@ -22,9 +25,7 @@
         <button type="button" x-on:click="sidebarOpen = false"
             class="rounded-lg p-1.5 text-slate-500 hover:bg-slate-100 lg:hidden dark:hover:bg-slate-800">
             <span class="sr-only">Close navigation</span>
-            <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke-width="1.75" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
-            </svg>
+            <x-icon name="x" class="h-5 w-5" />
         </button>
     </div>
 
@@ -36,6 +37,7 @@
             @endphp
 
             <a href="{{ route($link['route']) }}" @if ($active) aria-current="page" @endif
+                x-on:click="sidebarOpen = false"
                 class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors
                     {{ $active
                         ? 'bg-brand-50 text-brand-700 dark:bg-brand-500/10 dark:text-brand-300'
@@ -46,10 +48,12 @@
         @endforeach
     </nav>
 
-    <div class="border-t border-slate-200 p-3 dark:border-slate-800">
-        <x-button :href="route('sales.create')" class="w-full justify-center">
-            <x-icon name="plus" class="h-4 w-4" />
-            New Sale
-        </x-button>
-    </div>
+    @can('create', App\Models\Sale::class)
+        <div class="border-t border-slate-200 p-3 dark:border-slate-800">
+            <x-button :href="route('sales.create')" class="w-full justify-center">
+                <x-icon name="plus" class="h-4 w-4" />
+                New Sale
+            </x-button>
+        </div>
+    @endcan
 </aside>

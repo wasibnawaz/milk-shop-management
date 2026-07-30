@@ -29,11 +29,15 @@ class DealerController extends Controller
 
     public function create(): View
     {
+        $this->authorize('create', Dealer::class);
+
         return view('dealers.create');
     }
 
     public function store(StoreDealerRequest $request): RedirectResponse
     {
+        $this->authorize('create', Dealer::class);
+
         $dealer = Dealer::create($request->validated());
 
         return redirect()
@@ -43,11 +47,15 @@ class DealerController extends Controller
 
     public function edit(Dealer $dealer): View
     {
+        $this->authorize('update', $dealer);
+
         return view('dealers.edit', compact('dealer'));
     }
 
     public function update(StoreDealerRequest $request, Dealer $dealer): RedirectResponse
     {
+        $this->authorize('update', $dealer);
+
         $dealer->update($request->validated());
 
         return redirect()
@@ -57,6 +65,8 @@ class DealerController extends Controller
 
     public function destroy(Dealer $dealer): RedirectResponse
     {
+        $this->authorize('delete', $dealer);
+
         // sales.dealer_id is nullOnDelete, so removing a dealer detaches their
         // sales rather than destroying them.
         $dealer->delete();

@@ -2,17 +2,19 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\Enums\UserRole;
 use Database\Factories\UserFactory;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
 class User extends Authenticatable
 {
     /** @use HasFactory<UserFactory> */
-    use HasFactory, Notifiable;
+    use HasFactory, Notifiable, SoftDeletes;
 
     /**
      * The attributes that are mass assignable.
@@ -23,6 +25,8 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'role',
+        'is_active',
     ];
 
     /**
@@ -44,7 +48,10 @@ class User extends Authenticatable
     {
         return [
             'email_verified_at' => 'datetime',
+            'last_login_at' => 'datetime',
             'password' => 'hashed',
+            'role' => UserRole::class,
+            'is_active' => 'boolean',
         ];
     }
 
@@ -56,5 +63,27 @@ class User extends Authenticatable
     public function sales(): HasMany
     {
         return $this->hasMany(Sale::class);
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Role helpers
+    |--------------------------------------------------------------------------
+    */
+
+    public function isAdmin(): bool
+    {
+        return $this->role === UserRole::Admin;
+    }
+
+    public function hasRole(UserRole ...$roles): bool
+    {
+        return in_array($this->role, $roles, true);
+    }
+
+    /** @param  Builder<$this>  $query */
+    public function scopeActive(Builder $query): void
+    {
+        $query->where('is_active', true);
     }
 }
