@@ -6,6 +6,7 @@ use App\Enums\UserRole;
 use App\Http\Requests\StoreUserRequest;
 use App\Http\Requests\UpdateUserRequest;
 use App\Models\User;
+use App\Support\TableSort;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -19,17 +20,29 @@ class UserController extends Controller
 
         $search = $request->string('search')->toString();
 
-        $users = User::query()
+        $sorter = TableSort::make([
+            'name' => 'name',
+            'email' => 'email',
+            'role' => 'role',
+            'sales_count' => 'sales_count',
+            'last_login_at' => 'last_login_at',
+            'is_active' => 'is_active',
+        ], 'name', 'asc');
+
+        $query = User::query()
             ->withCount('sales')
             ->when($search, fn ($q, $term) => $q->where(
                 fn ($sub) => $sub->where('name', 'like', "%{$term}%")
                     ->orWhere('email', 'like', "%{$term}%")
-            ))
-            ->orderBy('name')
-            ->paginate(config('shop.per_page'))
-            ->withQueryString();
+            ));
 
-        return view('users.index', compact('users', 'search'));
+        $sorter->apply($query, $request);
+
+        return view('users.index', [
+            'users' => $query->paginate(config('shop.per_page'))->withQueryString(),
+            'search' => $search,
+            'sort' => $sorter->state($request),
+        ]);
     }
 
     public function create(): View

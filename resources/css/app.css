@@ -31,6 +31,20 @@
 }
 
 @layer base {
+    /*
+    | Chart series colour, kept as a role token so light and dark swap in one
+    | place. Both steps are validated against their own surface (white / slate-900)
+    | at >= 3:1 contrast. Charts are single-series, so no categorical
+    | adjacency applies — see the dashboard for the accompanying labels.
+    */
+    :root {
+        --chart-series: #2a78d6;
+    }
+
+    :root.dark {
+        --chart-series: #3987e5;
+    }
+
     html {
         -webkit-text-size-adjust: 100%;
     }
@@ -62,6 +76,33 @@
     /* Keep Alpine-controlled elements hidden until Alpine boots. */
     [x-cloak] {
         display: none !important;
+    }
+}
+
+@layer components {
+    /*
+    | Busy state for submit buttons, set by resources/js/forms.js. The spinner
+    | replaces the icon slot so the button keeps its width and the layout does
+    | not jump mid-submit.
+    */
+    button[aria-busy='true'] {
+        @apply pointer-events-none relative opacity-70;
+    }
+
+    button[aria-busy='true'] > svg:first-child {
+        @apply invisible;
+    }
+
+    button[aria-busy='true']::before {
+        content: '';
+        @apply absolute left-4 h-4 w-4 rounded-full border-2 border-current border-t-transparent;
+        animation: spin 0.6s linear infinite;
+    }
+
+    @keyframes spin {
+        to {
+            transform: rotate(360deg);
+        }
     }
 }
 

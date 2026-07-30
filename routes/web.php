@@ -51,6 +51,10 @@ Route::middleware(['auth', 'active'])->group(function (): void {
 
     Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
 
+    // Declared before the resource so /sales/export is not captured by
+    // /sales/{sale} route-model binding.
+    Route::get('sales/export', [SaleController::class, 'export'])->name('sales.export');
+
     Route::resource('sales', SaleController::class)->except('show');
     Route::resource('products', ProductController::class)->except('show');
     Route::resource('dealers', DealerController::class)->except('show');

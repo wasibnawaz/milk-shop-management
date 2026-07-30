@@ -5,7 +5,9 @@
     a record permanently. Alpine guards the submit; the record is soft deleted
     server-side, so it stays recoverable in the database either way.
 --}}
-<form method="post" action="{{ $action }}" x-data
+{{-- data-no-busy: the confirm dialog can cancel this submit, and the busy
+     handler would otherwise leave the button permanently disabled. --}}
+<form method="post" action="{{ $action }}" x-data data-no-busy
     x-on:submit.prevent="if (window.confirm(@js($confirm))) $el.submit()" class="inline">
     @csrf
     @method('delete')

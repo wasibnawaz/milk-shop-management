@@ -30,13 +30,13 @@
             <div class="overflow-x-auto">
                 <table class="w-full min-w-[42rem] text-left text-sm">
                     <thead class="border-b border-slate-200 bg-slate-50 dark:border-slate-800 dark:bg-slate-800/50">
-                        <tr class="text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
-                            <th scope="col" class="px-4 py-3 sm:px-5">Name</th>
-                            <th scope="col" class="px-4 py-3">Email</th>
-                            <th scope="col" class="px-4 py-3">Role</th>
-                            <th scope="col" class="px-4 py-3 text-right">Sales</th>
-                            <th scope="col" class="px-4 py-3">Last Seen</th>
-                            <th scope="col" class="px-4 py-3">Status</th>
+                        <tr>
+                            <x-sort-header column="name" :sort="$sort" class="sm:pl-5">Name</x-sort-header>
+                            <x-sort-header column="email" :sort="$sort">Email</x-sort-header>
+                            <x-sort-header column="role" :sort="$sort">Role</x-sort-header>
+                            <x-sort-header column="sales_count" :sort="$sort" align="right" class="text-right">Sales</x-sort-header>
+                            <x-sort-header column="last_login_at" :sort="$sort">Last Seen</x-sort-header>
+                            <x-sort-header column="is_active" :sort="$sort">Status</x-sort-header>
                             <th scope="col" class="px-4 py-3 text-right sm:px-5"><span class="sr-only">Actions</span></th>
                         </tr>
                     </thead>

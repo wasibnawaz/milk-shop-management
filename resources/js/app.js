@@ -1,5 +1,6 @@
 import './bootstrap';
 import './theme';
+import './forms';
 
 import Alpine from 'alpinejs';
 

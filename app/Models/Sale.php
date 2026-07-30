@@ -9,11 +9,14 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Cache;
 
 class Sale extends Model
 {
     /** @use HasFactory<SaleFactory> */
     use HasFactory, SoftDeletes;
+
+    private const CACHE_VERSION_KEY = 'sales:cache-version';
 
     protected $fillable = [
         'product_id',
@@ -50,8 +53,26 @@ class Sale extends Model
     | disagrees with quantity * rate, or a "paid" status with nothing paid.
     */
 
+    /**
+     * Version stamp for cached aggregates. Bumped on every write, so a new
+     * sale invalidates the dashboard immediately rather than after a TTL.
+     */
+    public static function cacheVersion(): int
+    {
+        return (int) Cache::rememberForever(self::CACHE_VERSION_KEY, fn () => 1);
+    }
+
+    public static function bumpCacheVersion(): void
+    {
+        Cache::forever(self::CACHE_VERSION_KEY, self::cacheVersion() + 1);
+    }
+
     protected static function booted(): void
     {
+        foreach (['saved', 'deleted', 'restored'] as $event) {
+            static::$event(fn () => self::bumpCacheVersion());
+        }
+
         static::saving(function (self $sale): void {
             $sale->total_amount = round((float) $sale->quantity * (float) $sale->unit_rate, 2);
 
